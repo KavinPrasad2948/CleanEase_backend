@@ -17,16 +17,16 @@ router.get('/', auth, async (req, res) => {
 
 //! Create a new booking
 router.post('/', auth, async (req, res) => {
-  const { service, date, userEmail,notes } = req.body; // Include userEmail from frontend
+  const { service, date, userEmail,notes } = req.body; 
 
   try {
-    // Check if there are already 3 bookings for the specified date
+    
     const existingBookings = await Booking.find({ date });
     if (existingBookings.length >= 3) {
       return res.status(400).json({ msg: 'Maximum bookings reached for this date' });
     }
 
-    // Create a new booking instance
+    
     const newBooking = new Booking({
       user: req.user.id,
       service,
@@ -36,7 +36,6 @@ router.post('/', auth, async (req, res) => {
       
     });
 
-    // Save the new booking to the database
     const booking = await newBooking.save();
     res.json(booking);
   } catch (err) {
@@ -55,17 +54,17 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(404).json({ msg: 'Booking not found' });
     }
 
-    // Ensure user owns booking
+    
     if (booking.user.toString() !== req.user.id) {
       return res.status(401).json({ msg: 'Not authorized' });
     }
 
-    // Update booking fields
+    
     booking.service = service || booking.service;
     booking.date = date || booking.date;
     booking.notes = notes || booking.notes;
 
-    // Save the updated booking to the database
+   
     await booking.save();
     res.json(booking);
   } catch (err) {

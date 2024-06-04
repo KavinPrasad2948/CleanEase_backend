@@ -1,7 +1,7 @@
-// controllers/bookingController.js
+
 const Booking = require('../models/Booking');
 
-// Create a new booking
+//! Create a new booking
 exports.createBooking = async (req, res) => {
   const { service, date } = req.body;
 
@@ -20,7 +20,7 @@ exports.createBooking = async (req, res) => {
   }
 };
 
-// Get all bookings for the current user
+//! Get all bookings for the current user
 exports.getBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user.id }).sort({ date: -1 });
@@ -31,7 +31,7 @@ exports.getBookings = async (req, res) => {
   }
 };
 
-// Update a booking
+//! Update a booking
 exports.updateBooking = async (req, res) => {
   const { service, date, status } = req.body;
 

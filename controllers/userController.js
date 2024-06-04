@@ -1,9 +1,9 @@
-// controllers/userController.js
+
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Register a new user
+//! Register a new user
 exports.register = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -29,7 +29,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// Authenticate user and get token
+//! Authenticate user and get token
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -51,7 +51,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// Get current user's profile
+//! Get current user's profile
 exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -62,7 +62,7 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// Update user profile
+//! Update user profile
 exports.updateProfile = async (req, res) => {
   const { name, email } = req.body;
   const userFields = { name, email };

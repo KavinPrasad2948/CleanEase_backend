@@ -3,7 +3,7 @@ const auth = require('../middleware/auth');
 const User = require('../models/User');
 const router = express.Router();
 
-// Get user profile
+//! Get user profile
 router.get('/', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -17,7 +17,7 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Update user profile
+//! Update user profile
 router.put('/', auth, async (req, res) => {
   const { name, address, phone } = req.body;
 
