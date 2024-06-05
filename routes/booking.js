@@ -15,17 +15,18 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+
 //! Create a new booking
 router.post('/', auth, async (req, res) => {
   const { service, date, userEmail,notes } = req.body; 
-
+  
   try {
     
     const existingBookings = await Booking.find({ date });
     if (existingBookings.length >= 3) {
       return res.status(400).json({ msg: 'Maximum bookings reached for this date' });
     }
-
+    
     
     const newBooking = new Booking({
       user: req.user.id,
@@ -35,7 +36,7 @@ router.post('/', auth, async (req, res) => {
       notes,
       
     });
-
+    
     const booking = await newBooking.save();
     res.json(booking);
   } catch (err) {
@@ -43,6 +44,7 @@ router.post('/', auth, async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
 
 //! Update a booking
 router.put('/:id', auth, async (req, res) => {
@@ -93,5 +95,29 @@ router.delete('/:id', auth, async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+//! Search bookings
+router.get('/search', async (req, res) => {
+  const { query } = req.query;
+  
+  try {
+    const query = {};
+    if (search) {
+      const keywords = search.split(' ');
+      keywords.forEach(keyword => {
+        if (keyword.includes(':')) {
+          const [key, value] = keyword.split(':');
+          query[key.trim()] = value.trim();
+        }
+      });
+    }
+
+    const bookings = await Booking.find(query);
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 module.exports = router;
