@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const dbURI = 'mongodb+srv://Clean_Ease:TN63BC3436@cleanease.nnua5vg.mongodb.net/';
+const dbURI = process.env.MONGO_URI;;
 
 mongoose.connect(dbURI, {
   useCreateIndex: true,
