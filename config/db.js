@@ -1,17 +1,12 @@
-
 const mongoose = require('mongoose');
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('MongoDB connected...');
-  } catch (err) {
-    console.error(err.message);
-    process.exit(1);
-  }
-};
+const dbURI = 'mongodb+srv://Clean_Ease:TN63BC3436@cleanease.nnua5vg.mongodb.net/';
 
-module.exports = connectDB;
+mongoose.connect(dbURI, {
+  useCreateIndex: true,
+  useFindAndModify: false,
+}).then(() => {
+  console.log('Database connection successful');
+}).catch((err) => {
+  console.error('Database connection error:', err);
+});
