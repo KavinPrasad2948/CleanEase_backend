@@ -6,9 +6,7 @@ const auth = require('../middleware/auth');
 const Notification = require('../models/Notification');
 
 
-// Assuming you have other routes like authentication, bookings, etc.
 
-// Route to fetch notifications for the logged-in user
 router.get('/notifications', auth, async (req, res) => {
   try {
     
