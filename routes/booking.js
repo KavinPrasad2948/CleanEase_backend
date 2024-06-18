@@ -22,32 +22,22 @@ router.get("/", auth, async (req, res) => {
 
 //! Create a new booking
 router.post("/", auth, async (req, res) => {
-  const { name, email, address, phoneNumber, totalSquareFootage, typeOfResidence, typeOfFlooring, numberOfBedrooms, numberOfBathrooms, servicesRequested, paymentMethod, date } = req.body;
+  const { service, date, userEmail, notes } = req.body;
 
   try {
-    // Check if the maximum number of bookings for the specified date has been reached
     const existingBookings = await Booking.find({ date });
     if (existingBookings.length >= 3) {
       return handleError(res, 400, "Maximum bookings reached for this date");
     }
 
-    // Create a new booking instance
     const newBooking = new Booking({
-      name,
-      email,
-      address,
-      phoneNumber,
-      totalSquareFootage,
-      typeOfResidence,
-      typeOfFlooring,
-      numberOfBedrooms,
-      numberOfBathrooms,
-      servicesRequested,
-      paymentMethod,
-      date
+      user: req.user.id,
+      service,
+      date,
+      userEmail,
+      notes,
     });
 
-    // Save the new booking to the database
     const booking = await newBooking.save();
     res.json(booking);
   } catch (err) {
@@ -114,20 +104,17 @@ router.get("/search", async (req, res) => {
       keywords.forEach((keyword) => {
         if (keyword.includes(":")) {
           const [key, value] = keyword.split(":");
-          
           query[key.trim()] = value.trim();
         }
       });
     }
 
-    //* Find bookings based on constructed query
     const bookings = await Booking.find(query);
     res.json(bookings);
   } catch (err) {
     console.error(err.message);
-    //* Handle errors 
     handleError(res, 500, "Server error");
   }
-})
+});
 
 module.exports = router;
