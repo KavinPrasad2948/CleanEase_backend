@@ -3,9 +3,13 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const router = express.Router();
+
+//* Utility function for error responses
+const handleError = (res, statusCode, message) => {
+  return res.status(statusCode).json({ error: message });
+};
 
 //! Register
 router.post("/register", async (req, res) => {
@@ -13,7 +17,7 @@ router.post("/register", async (req, res) => {
   try {
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ msg: "User already exists" });
+      return handleError(res, 400, "User already exists");
     }
 
     user = new User({ name, email, password });
@@ -36,7 +40,7 @@ router.post("/register", async (req, res) => {
     );
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    handleError(res, 500, "Server error");
   }
 });
 
@@ -46,12 +50,12 @@ router.post("/login", async (req, res) => {
   try {
     let user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ msg: "Invalid credentials" });
+      return handleError(res, 400, "Invalid credentials");
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid credentials" });
+      return handleError(res, 400, "Invalid credentials");
     }
 
     const payload = { user: { id: user.id } };
@@ -62,12 +66,12 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1h" },
       (err, token) => {
         if (err) throw err;
-        res.json({ msg:"Login successful",token });
+        res.json({ msg: "Login successful", token });
       }
     );
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    handleError(res, 500, "Server error");
   }
 });
 
@@ -77,7 +81,7 @@ router.post("/forgotpassword", async (req, res) => {
   try {
     let user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ msg: "User not found" });
+      return handleError(res, 400, "User not found");
     }
 
     const token = crypto.randomBytes(20).toString("hex");
@@ -88,7 +92,7 @@ router.post("/forgotpassword", async (req, res) => {
     res.status(200).json({ msg: "Reset token sent", token });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    handleError(res, 500, "Server error");
   }
 });
 
@@ -101,10 +105,9 @@ router.post("/reset/:token", async (req, res) => {
     });
 
     if (!user) {
-      return res
-        .status(400)
-        .json({ msg: "Password reset token is invalid or has expired" });
+      return handleError(res, 400, "Password reset token is invalid or has expired");
     }
+    
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(req.body.password, salt);
     user.resetPasswordToken = undefined;
@@ -114,7 +117,7 @@ router.post("/reset/:token", async (req, res) => {
     res.status(200).json({ msg: "Password reset successful" });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error",err);
+    handleError(res, 500, "Server error");
   }
 });
 
